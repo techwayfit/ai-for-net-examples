@@ -1,30 +1,55 @@
+import os
+import openai
+from dotenv import load_dotenv
+load_dotenv()
+open_ai_key = os.getenv("API_KEY")
+base_url = os.getenv("BASE_URL")
 
-import os;
-from dotenv import load_dotenv;
-load_dotenv();
-from openai import OpenAI;
-
-def user_message(message:str):
-    return {"role": "user", "content": message};
-def system_message(message:str):
-    return {"role": "system", "content": message};
-def assistant_message(message:str):
-    return {"role": "assistant", "content": message};
-
-def call_llm(client, messages:list, model_choice:str="gpt-4.1-mini", temperature:float=0.7):
+def chat_message(role:str,message:str):
+    return {"role": role, "content": message}; 
+def call_llm(client, messages:list, model_choice:str="gpt-4.1-mini"):
     system_prompt = "You are a helpful assistant that provides concise and accurate answers to user queries.";
+    messages.append(chat_message("system", system_prompt));
     response = client.chat.completions.create(
         model=model_choice,
-        messages=messages.append(system_message(system_prompt)),
-        temperature=temperature, 
+        messages=messages
     );
     return response.choices[0].message;
 
-client = OpenAI(base_url=os.getenv("BASE_URL"), api_key=os.getenv("API_KEY"));
-messages=[];
-while True: # C# Equivalent: while (true) {
-    user_input = input("You: ");
-    messages.append(user_message(user_input)); # C# Equivalent: messages.Add(user_message(user_input));
-    llm_response = call_llm(client, messages);
-    print(f"Assistant: {llm_response.content}");
-    messages.append(llm_response); 
+
+
+
+client = openai.OpenAI(base_url=base_url, api_key=open_ai_key)
+messages = [];
+messages.append(chat_message("user",input("You: ")))
+response = call_llm(client, messages);
+
+print(response.content)
+
+
+def call_llm_2(client, *messages, model_choice:str="gpt-4.1-mini"):
+    messages = list(messages)
+    response = client.chat.completions.create(
+        model=model_choice,
+        messages=messages
+    );
+    return response.choices[0].message;
+
+ 
+system_prompt = "You are a helpful assistant that provides concise and accurate answers to user queries.";
+response = call_llm_2(client, chat_message("user",input("You: ")),chat_message("system",system_prompt));
+
+print(response.content)
+
+def call_llm_3(client, *messages, **args):
+    messages = list(messages)
+    response = client.chat.completions.create(
+        messages=messages,
+        **args
+    );
+    return response.choices[0].message;
+
+ 
+response = call_llm_3(client, chat_message("user",input("You: ")),chat_message("system",system_prompt), model="gpt-4.1-mini", temperature=0.7);
+
+print(response.content)

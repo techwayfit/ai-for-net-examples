@@ -1,14 +1,14 @@
-from services.LLMClient import CreateOpenAIClient, CallLLM, LLMResponse;
+from services.LLMClient import *;
 
 
 def user_message(message:str):
     return {"role": "user", "content": message};
 
-client= CreateOpenAIClient();
-response =  CallLLM(client, [user_message("What is the capital of France?")]);
+client= create_llm_client();
+response =  _call_llm(client, [user_message("What is the capital of France?")]);
 print(response);
 
-response = LLMResponse("How can .Net Dev can learn AI?");
+response = llm_response("How can .Net Dev can learn AI?");
 print(response);
 
 
